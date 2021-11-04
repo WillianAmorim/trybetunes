@@ -36,8 +36,9 @@ class Login extends React.Component {
 
   render() {
     const { showButton, loading, goToSearch } = this.state;
-    const forms = (
+    return (
       <div data-testid="page-login">
+        { goToSearch && <Redirect to="/search" />}
         <label htmlFor="imput-name">
           <input
             id="imput-name"
@@ -54,12 +55,9 @@ class Login extends React.Component {
         >
           Entrar
         </button>
+        {loading && <Loading />}
       </div>
     );
-    if (goToSearch) {
-      return <Redirect to="/search" />;
-    }
-    return (loading) ? <Loading /> : forms;
   }
 }
 
