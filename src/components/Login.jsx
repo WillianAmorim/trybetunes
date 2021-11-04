@@ -1,53 +1,65 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
+import { createUser } from '../services/userAPI';
+import Loading from './Loading';
 
 class Login extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       name: '',
-      disable: true,
+      showButton: true,
+      loading: false,
+      goToSearch: false,
     };
   }
 
   handleChange = ({ target }) => {
-    const { value } = target;
-    this.setState({
-      name: value,
-    });
-  }
-
-  enableButton = (value) => {
-    const { name } = this.state;
-    const NUMBER = 3;
-    if (value.length >= NUMBER) {
+    if (target.value.length > 2) {
       this.setState({
-        disable: false,
+        name: target.value,
+        showButton: false,
       });
     }
   }
 
+  handleButtom = async () => {
+    this.setState({
+      loading: true,
+    });
+    const { name } = this.state;
+    await createUser({ name });
+    this.setState({
+      goToSearch: true,
+    });
+  }
+
   render() {
-    const { name, disable } = this.state;
-    return (
+    const { showButton, loading, goToSearch } = this.state;
+    const forms = (
       <div data-testid="page-login">
-        Componente Login
-        <form>
+        <label htmlFor="imput-name">
           <input
+            id="imput-name"
             type="text"
             data-testid="login-name-input"
-            value={ this.enableButton }
+            onChange={ this.handleChange }
           />
-          Insira seu nome
-          <button
-            data-testid="login-submit-button"
-            type="button"
-            disabled={ disable }
-          >
-            Entrar
-          </button>
-        </form>
+        </label>
+        <button
+          type="button"
+          data-testid="login-submit-button"
+          onClick={ this.handleButtom }
+          disabled={ showButton }
+        >
+          Entrar
+        </button>
       </div>
     );
+    if (goToSearch) {
+      return <Redirect to="/search" />;
+    }
+    return (loading) ? <Loading /> : forms;
   }
 }
 
